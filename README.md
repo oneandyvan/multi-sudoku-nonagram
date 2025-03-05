@@ -126,11 +126,11 @@ Nonograms, like Sudoku, are **NP-complete** and may have **multiple solutions** 
 ---
 
 ## References
-- *The Effect of Guess Choices on the Efficiency of a Backtracking Algorithm in a Sudoku Solver* ([IEEE Xplore](https://ieeexplore.ieee.org/document/6845190))&#8203;:contentReference[oaicite:0]{index=0}
-- *Techniques for Solving Sudoku Puzzles* ([arXiv](https://arxiv.org/pdf/1203.2295))&#8203;:contentReference[oaicite:1]{index=1}
-- *Solving Sudoku efficiently with Dancing Links* ([DiVA Portal](https://www.diva-portal.org/smash/record.jsf?pid=diva2%3A770655&dswid=2627))&#8203;:contentReference[oaicite:2]{index=2}
-- *Solving Nonograms by Combining Relaxations* ([ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0031320308005153))&#8203;:contentReference[oaicite:3]{index=3}
-- *Algorithms Effectiveness Comparison in Solving Nonogram Boards* ([ScienceDirect](https://www.sciencedirect.com/science/article/pii/S1877050921016902))&#8203;:contentReference[oaicite:4]{index=4}
+- *The Effect of Guess Choices on the Efficiency of a Backtracking Algorithm in a Sudoku Solver* ([IEEE Xplore](https://ieeexplore.ieee.org/document/6845190))
+- *Techniques for Solving Sudoku Puzzles* ([arXiv](https://arxiv.org/pdf/1203.2295))
+- *Solving Sudoku efficiently with Dancing Links* ([DiVA Portal](https://www.diva-portal.org/smash/record.jsf?pid=diva2%3A770655&dswid=2627))
+- *Solving Nonograms by Combining Relaxations* ([ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0031320308005153))
+- *Algorithms Effectiveness Comparison in Solving Nonogram Boards* ([ScienceDirect](https://www.sciencedirect.com/science/article/pii/S1877050921016902))
 
 ---
 
