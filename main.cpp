@@ -2,6 +2,7 @@
 //Otherwise digits are stored as their integer value.
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cctype>
 
@@ -101,7 +102,72 @@ public:
         }
         return true;
     }
+
+    //Checks if placement of number is valid with sudoku rules and current info
+    bool isValid(int row, int col, int num){
+        //checks row
+        for(int i = 0; i < WIDTH; i++){
+            if(currentBoard[row][i] == num){
+                return false;
+            }
+        }
+
+        //checks col
+        for(int i = 0; i < HEIGHT; i++){
+            if(currentBoard[i][col] == num){
+                return false;
+            }
+        }
+
+        //checks 3x3 grid
+        int rowLoc = row - row % 3;
+        int colLoc = col - col % 3;
+
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                if(currentBoard[i + rowLoc][j + colLoc] == num){
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
+    }
+
+    //Attempts to solve sudoku via recursion
+    bool solve(){
+        for(int i = 0; i < HEIGHT; i++)
+        {
+            for(int j = 0; j < WIDTH; j++)
+            {
+                //Tries 1-9 on blank space
+                if(currentBoard[i][j] == -1)
+                {
+                    for(int num = 1; num <= 9; num++)
+                    {
+                        if(isValid(i,j,num))
+                        {
+
+                            currentBoard[i][j] = num;
+
+                            if(solve())
+                            {
+                                return true;
+                            }
+
+                            currentBoard[i][j] = -1;
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
 };
+
 
 int main(int argc, char *argv[])
 {
@@ -114,6 +180,7 @@ int main(int argc, char *argv[])
 
     cout << "Current board:\n";
     sudoku.printBoard(sudoku.currentBoard);
+
     cout << "Completed board:\n";
     sudoku.printBoard(sudoku.completedBoard);
 
@@ -121,5 +188,11 @@ int main(int argc, char *argv[])
         cout << "The current board is correct.\n";
     }
 
+    if(sudoku.solve()){
+        cout << "The current board was solved.\n";
+        sudoku.printBoard(sudoku.currentBoard);
+    }else{
+        cout << "The current board was NOT solved.\n";
+    }
     return 0;
 }
