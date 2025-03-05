@@ -25,7 +25,7 @@ Here is a rough draft of the research paper.
 - **Andrew Browning** - Undergrad, Dept. Computer Science, University of Central Florida
 - **Ohm Patel** - Undergrad, Dept. Computer Science, University of Central Florida
 - **Kyle Seney** - Undergrad, Dept. Computer Science, University of Central Florida
-- **Andy Van** - Undergrad, Dept. Computer Science, University of Central Florida ([an601245@ucf.edu](mailto:an601245@ucf.edu))
+- **Andy Van** - Undergrad, Dept. Computer Science, University of Central Florida
 
 ---
 
