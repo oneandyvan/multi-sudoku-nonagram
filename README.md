@@ -19,7 +19,8 @@ This project is for **COP4520 (Spring 2025)** and aims to implement a **multi-th
 ---
 
 ## Report
-Here is a rough draft of the research paper.
+Here is a rough draft of the [paper](https://docs.google.com/document/d/1dcpnFOEYQ8LSIxTercKv7PKMg142GDkCQVmDmy0G9bc/edit?usp=sharing)
+This is a live document for collaboration purposes. For the milestone assignment, check the attached PDF in the submission to have an accurate view of work up to that point.
 
 ### Authors:
 - **Andrew Browning** - Undergrad, Dept. Computer Science, University of Central Florida
@@ -167,7 +168,3 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 - **Ohm Patel**
 - **Kyle Seney**
 - **Andy Van**
-
-
-## Report 
-Here is a rough draft of the [paper](https://docs.google.com/document/d/1dcpnFOEYQ8LSIxTercKv7PKMg142GDkCQVmDmy0G9bc/edit?usp=sharing)
