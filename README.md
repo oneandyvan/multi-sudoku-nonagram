@@ -35,8 +35,31 @@ Both **Sudoku** and **Nonograms** are puzzles that can be examined through **com
 ---
 
 ## Compilation Instructions
-Replace this section with the chosen programming language and build instructions.
 
+1. **Compile the Solver**  
+   ```bash
+   g++ main.cpp -o sudoku
+   ```
+   This will produce an executable named `sudoku`.
+
+2. **Run the Solver**  
+   ```bash
+   ./sudoku test1.txt
+   ```
+   Replace `test1.txt` with the path to your puzzle file. The file should have:
+   - **First 9 lines:** The current (incomplete) Sudoku board, where underscores (`_`) or other non-digit characters are interpreted as blank spaces (`-1`).
+   - **Next 9 lines:** The completed Sudoku board for validation.
+
+3. **Output**  
+   - The program prints the current board and the completed board.  
+   - It checks if the current board is correct (i.e., no contradictions so far).  
+   - If possible, it attempts to solve the Sudoku using a backtracking algorithm and prints the solved board.
+
+4. **Notes**  
+   - Blank spaces are stored as `-1` internally.  
+   - Digits are stored at their integer values (`1` through `9`).  
+   - The code checks row, column, and 3×3 box constraints before placing any number.  
+   - The solver uses recursion to fill in valid candidates until the puzzle is solved or deemed unsolvable.
 ---
 
 ## Introduction
