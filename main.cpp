@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <fstream>
 #include <cctype>
+#include <thread>
+#include <vector>
 
 using namespace std;
 
@@ -135,6 +137,44 @@ public:
 
     }
 
+    //  Checks Row Constraint (Split for Multi-threading)
+    bool rowValid(int row, int col, int num)
+    {
+        for(int i = 0; i < WIDTH; i++){
+            if(currentBoard[row][i] == num){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //  Checks Column Constraint (Split for Multi-threading)
+    bool rowValid(int row, int col, int num)
+    {
+        for(int i = 0; i < HEIGHT; i++){
+            if(currentBoard[i][col] == num){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //  Checks Subgrid (3x3) Constraint (Split for Multi-threading)
+    bool rowValid(int row, int col, int num)
+    {
+        int rowLoc = row - row % 3;
+        int colLoc = col - col % 3;
+
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                if(currentBoard[i + rowLoc][j + colLoc] == num){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     //Attempts to solve sudoku via recursion
     bool solve(){
         for(int i = 0; i < HEIGHT; i++)
@@ -186,6 +226,9 @@ int main(int argc, char *argv[])
 
     if(sudoku.isCorrect()){
         cout << "The current board is correct.\n";
+    }
+    else{
+        cout << "The current board is not correct.\n";
     }
 
     if(sudoku.solve()){
