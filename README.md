@@ -39,7 +39,7 @@ Both **Sudoku** and **Nonograms** are puzzles that can be examined through **com
 
 1. **Compile the Solver**  
    ```bash
-   g++ main.cpp -o sudoku
+   g++ -std=c++2a -pthread main.cpp -o sudoku
    ```
    This will produce an executable named `sudoku`.
 

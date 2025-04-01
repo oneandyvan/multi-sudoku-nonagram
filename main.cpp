@@ -7,6 +7,7 @@
 #include <cctype>
 #include <thread>
 #include <vector>
+#include <chrono>
 
 using namespace std;
 
@@ -107,72 +108,49 @@ public:
 
     //Checks if placement of number is valid with sudoku rules and current info
     bool isValid(int row, int col, int num){
-        //checks row
-        for(int i = 0; i < WIDTH; i++){
-            if(currentBoard[row][i] == num){
-                return false;
-            }
+        // //checks row
+        // for(int i = 0; i < WIDTH; i++){
+        //     if(currentBoard[row][i] == num){
+        //         return false;
+        //     }
+        // }
+
+        // //checks col
+        // for(int i = 0; i < HEIGHT; i++){
+        //     if(currentBoard[i][col] == num){
+        //         return false;
+        //     }
+        // }
+
+        // //checks 3x3 grid
+        // int rowLoc = row - row % 3;
+        // int colLoc = col - col % 3;
+
+        // for(int i = 0; i < 3; i++){
+        //     for(int j = 0; j < 3; j++){
+        //         if(currentBoard[i + rowLoc][j + colLoc] == num){
+        //             return false;
+        //         }
+        //     }
+        // }
+
+        // return true;
+
+        bool rowValid = true, colValid = true, subgridValid = true;
+        vector<thread> threads;
+
+        // Create threads for row, column, and subgrid checks
+        threads.emplace_back(&Sudoku::isRowValid, this, row, num, ref(rowValid));
+        threads.emplace_back(&Sudoku::isColValid, this, col, num, ref(colValid));
+        threads.emplace_back(&Sudoku::isSubgridValid, this, row, col, num, ref(subgridValid));
+
+        // Wait for threads to finish
+        for (auto &t : threads) {
+            t.join();
         }
 
-        //checks col
-        for(int i = 0; i < HEIGHT; i++){
-            if(currentBoard[i][col] == num){
-                return false;
-            }
-        }
-
-        //checks 3x3 grid
-        int rowLoc = row - row % 3;
-        int colLoc = col - col % 3;
-
-        for(int i = 0; i < 3; i++){
-            for(int j = 0; j < 3; j++){
-                if(currentBoard[i + rowLoc][j + colLoc] == num){
-                    return false;
-                }
-            }
-        }
-
-        return true;
-
-    }
-
-    //  Checks Row Constraint (Split for Multi-threading)
-    bool rowValid(int row, int col, int num)
-    {
-        for(int i = 0; i < WIDTH; i++){
-            if(currentBoard[row][i] == num){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    //  Checks Column Constraint (Split for Multi-threading)
-    bool rowValid(int row, int col, int num)
-    {
-        for(int i = 0; i < HEIGHT; i++){
-            if(currentBoard[i][col] == num){
-                return false;
-            }
-        }
-        return true;
-    }
-
-    //  Checks Subgrid (3x3) Constraint (Split for Multi-threading)
-    bool rowValid(int row, int col, int num)
-    {
-        int rowLoc = row - row % 3;
-        int colLoc = col - col % 3;
-
-        for(int i = 0; i < 3; i++){
-            for(int j = 0; j < 3; j++){
-                if(currentBoard[i + rowLoc][j + colLoc] == num){
-                    return false;
-                }
-            }
-        }
-        return true;
+        // Return true if all checks passed
+        return rowValid && colValid && subgridValid;
     }
 
     //Attempts to solve sudoku via recursion
@@ -206,6 +184,44 @@ public:
         return true;
     }
 
+private:
+    //  Checks Row Constraint (Split for Multi-threading)
+    void isRowValid(int row, int num, bool &result)
+    {
+        for(int i = 0; i < WIDTH; i++){
+            if(currentBoard[row][i] == num){
+                result = false;
+                return;
+            }
+        }
+    }
+
+    //  Checks Column Constraint (Split for Multi-threading)
+    void isColValid(int col, int num, bool &result)
+    {
+        for(int i = 0; i < HEIGHT; i++){
+            if(currentBoard[i][col] == num){
+                result = false;
+                return;
+            }
+        }
+    }
+
+    //  Checks Subgrid (3x3) Constraint (Split for Multi-threading)
+    void isSubgridValid(int row, int col, int num, bool &result)
+    {
+        int rowLoc = row - row % 3;
+        int colLoc = col - col % 3;
+
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                if(currentBoard[i + rowLoc][j + colLoc] == num){
+                    result = false;
+                    return;
+                }
+            }
+        }
+    }
 };
 
 
@@ -231,11 +247,15 @@ int main(int argc, char *argv[])
         cout << "The current board is not correct.\n";
     }
 
+    auto startTimeSudoku = chrono::high_resolution_clock::now();
     if(sudoku.solve()){
         cout << "The current board was solved.\n";
         sudoku.printBoard(sudoku.currentBoard);
     }else{
         cout << "The current board was NOT solved.\n";
     }
+    auto durationSudoku = chrono::high_resolution_clock::now() - startTimeSudoku;
+    cout << "Sudoku Time = " << chrono::duration_cast<chrono::milliseconds>(durationSudoku).count() << " ms\n" << endl;
+
     return 0;
 }
