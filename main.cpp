@@ -106,36 +106,38 @@ public:
         return true;
     }
 
-    //Checks if placement of number is valid with sudoku rules and current info
     bool isValid(int row, int col, int num){
-        // //checks row
-        // for(int i = 0; i < WIDTH; i++){
-        //     if(currentBoard[row][i] == num){
-        //         return false;
-        //     }
-        // }
+        //checks row
+        for(int i = 0; i < WIDTH; i++){
+            if(currentBoard[row][i] == num){
+                return false;
+            }
+        }
 
-        // //checks col
-        // for(int i = 0; i < HEIGHT; i++){
-        //     if(currentBoard[i][col] == num){
-        //         return false;
-        //     }
-        // }
+        //checks col
+        for(int i = 0; i < HEIGHT; i++){
+            if(currentBoard[i][col] == num){
+                return false;
+            }
+        }
 
-        // //checks 3x3 grid
-        // int rowLoc = row - row % 3;
-        // int colLoc = col - col % 3;
+        //checks 3x3 grid
+        int rowLoc = row - row % 3;
+        int colLoc = col - col % 3;
 
-        // for(int i = 0; i < 3; i++){
-        //     for(int j = 0; j < 3; j++){
-        //         if(currentBoard[i + rowLoc][j + colLoc] == num){
-        //             return false;
-        //         }
-        //     }
-        // }
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++){
+                if(currentBoard[i + rowLoc][j + colLoc] == num){
+                    return false;
+                }
+            }
+        }
 
-        // return true;
+        return true;
+    }
 
+    //  Checks if placement of number is valid with sudoku rules and current info using (Parallel)
+    bool isValidParallel(int row, int col, int num){
         bool rowValid = true, colValid = true, subgridValid = true;
         vector<thread> threads;
 
@@ -153,7 +155,7 @@ public:
         return rowValid && colValid && subgridValid;
     }
 
-    //Attempts to solve sudoku via recursion
+    //Attempts to solve sudoku via recursion (Parallel)
     bool solve(){
         for(int i = 0; i < HEIGHT; i++)
         {
@@ -170,6 +172,37 @@ public:
                             currentBoard[i][j] = num;
 
                             if(solve())
+                            {
+                                return true;
+                            }
+
+                            currentBoard[i][j] = -1;
+                        }
+                    }
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    //Attempts to solve sudoku via recursion (Parallel)
+    bool solveParallel(){
+        for(int i = 0; i < HEIGHT; i++)
+        {
+            for(int j = 0; j < WIDTH; j++)
+            {
+                //Tries 1-9 on blank space
+                if(currentBoard[i][j] == -1)
+                {
+                    for(int num = 1; num <= 9; num++)
+                    {
+                        if(isValidParallel(i,j,num))
+                        {
+
+                            currentBoard[i][j] = num;
+
+                            if(solveParallel())
                             {
                                 return true;
                             }
@@ -228,7 +261,9 @@ private:
 int main(int argc, char *argv[])
 {
     Sudoku sudoku;
+    Sudoku sudokuSequential;
 
+    //  Sequential Sudoku
     if (argc > 1)
     {
         sudoku.readInput(argv[1]);
@@ -254,8 +289,40 @@ int main(int argc, char *argv[])
     }else{
         cout << "The current board was NOT solved.\n";
     }
+
     auto durationSudoku = chrono::high_resolution_clock::now() - startTimeSudoku;
-    cout << "Sudoku Time = " << chrono::duration_cast<chrono::milliseconds>(durationSudoku).count() << " ms\n" << endl;
+    cout << "Sudoku Sudoku Time = " << chrono::duration_cast<chrono::milliseconds>(durationSudoku).count() << " ms\n" << endl;
+
+
+    //  Parallel Sudoku
+    if (argc > 1)
+    {
+        sudokuSequential.readInput(argv[1]);
+    }
+
+    cout << "Current board:\n";
+    sudokuSequential.printBoard(sudokuSequential.currentBoard);
+
+    cout << "Completed board:\n";
+    sudokuSequential.printBoard(sudokuSequential.completedBoard);
+
+    if(sudokuSequential.isCorrect()){
+        cout << "The current board is correct.\n";
+    }
+    else{
+        cout << "The current board is not correct.\n";
+    }
+
+    auto startTimeParSudoku = chrono::high_resolution_clock::now();
+    if(sudokuSequential.solveParallel()){
+        cout << "The current board was solved.\n";
+        sudokuSequential.printBoard(sudokuSequential.currentBoard);
+    }else{
+        cout << "The current board was NOT solved.\n";
+    }
+
+    auto parDurationSudoku = chrono::high_resolution_clock::now() - startTimeParSudoku;
+    cout << "Parallel Sudoku Time = " << chrono::duration_cast<chrono::milliseconds>(parDurationSudoku).count() << " ms\n" << endl;
 
     return 0;
 }
