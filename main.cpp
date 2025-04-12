@@ -32,13 +32,13 @@ public:
         }
     }
 
-    //reads input from .txt file
+    //  reads input from .txt file
     void readInput(const char *filename)
     {
         char value;
         ifstream file(filename);
 
-        // Read current board
+        //  Read current board
         for (int i = 0; i < HEIGHT; i++)
         {
             for (int j = 0; j < WIDTH; j++)
@@ -48,7 +48,7 @@ public:
             }
         }
 
-        // Read completed board
+        //  Read completed board
         for (int i = 0; i < HEIGHT; i++)
         {
             for (int j = 0; j < WIDTH; j++)
@@ -61,7 +61,7 @@ public:
         file.close();
     }
     
-    //prints a board
+    //  prints a board
     void printBoard(const int board[WIDTH][HEIGHT])
     {
         for (int i = 0; i < HEIGHT; i++)
@@ -92,7 +92,7 @@ public:
         cout << "------------------------------\n";
     }
 
-    //returns true if there are no mistakes in the current board (blank spaces are ok).
+    //  returns true if there are no mistakes in the current board (blank spaces are ok).
     bool isCorrect(){
         for (int i = 0; i < HEIGHT; i++)
         {
@@ -107,21 +107,21 @@ public:
     }
 
     bool isValid(int row, int col, int num){
-        //checks row
+        //  checks row
         for(int i = 0; i < WIDTH; i++){
             if(currentBoard[row][i] == num){
                 return false;
             }
         }
 
-        //checks col
+        //  checks col
         for(int i = 0; i < HEIGHT; i++){
             if(currentBoard[i][col] == num){
                 return false;
             }
         }
 
-        //checks 3x3 grid
+        //  checks 3x3 grid
         int rowLoc = row - row % 3;
         int colLoc = col - col % 3;
 
@@ -141,27 +141,27 @@ public:
         bool rowValid = true, colValid = true, subgridValid = true;
         vector<thread> threads;
 
-        // Create threads for row, column, and subgrid checks
+        //  Create threads for row, column, and subgrid checks
         threads.emplace_back(&Sudoku::isRowValid, this, row, num, ref(rowValid));
         threads.emplace_back(&Sudoku::isColValid, this, col, num, ref(colValid));
         threads.emplace_back(&Sudoku::isSubgridValid, this, row, col, num, ref(subgridValid));
 
-        // Wait for threads to finish
+        //  Wait for threads to finish
         for (auto &t : threads) {
             t.join();
         }
 
-        // Return true if all checks passed
+        //  Return true if all checks passed
         return rowValid && colValid && subgridValid;
     }
 
-    //Attempts to solve sudoku via recursion (Parallel)
+    //A ttempts to solve sudoku via recursion (Parallel)
     bool solve(){
         for(int i = 0; i < HEIGHT; i++)
         {
             for(int j = 0; j < WIDTH; j++)
             {
-                //Tries 1-9 on blank space
+                //  Tries 1-9 on blank space
                 if(currentBoard[i][j] == -1)
                 {
                     for(int num = 1; num <= 9; num++)
@@ -186,13 +186,13 @@ public:
         return true;
     }
 
-    //Attempts to solve sudoku via recursion (Parallel)
+    //  Attempts to solve sudoku via recursion (Parallel)
     bool solveParallel(){
         for(int i = 0; i < HEIGHT; i++)
         {
             for(int j = 0; j < WIDTH; j++)
             {
-                //Tries 1-9 on blank space
+                //  Tries 1-9 on blank space
                 if(currentBoard[i][j] == -1)
                 {
                     for(int num = 1; num <= 9; num++)
@@ -259,71 +259,111 @@ private:
 
 class Nonogram
 {
+public:
+    //  Dimensions of the Nonogram board
+    int rows;
+    int cols;
+    vector<vector<int>> rowConstraints;
+    vector<vector<int>> colConstraints;
 
+    Nonogram()
+    {
+        rows = 0;
+        cols = 0;
+    }
+
+    //  reads input from .txt file
+    void readInput(const char *filename)
+    {
+        char value;
+        ifstream file(filename);
+
+        //  Read current Nonogram board
+        file >> rows;
+        file >> cols;
+
+        rowConstraints.resize(rows);
+        colConstraints.resize(cols);
+
+        for(int i = 0; i < rows; i++)
+        {
+            
+        }
+
+        for(int i = 0; i < cols; i++)
+        {
+            
+        }
+
+        //  Read completed Nonogram board
+        
+
+        file.close();
+    }
 };
 
-void runSudoku(char* fileName)
+void runSudokuSolver(char* fileName)
 {
-    Sudoku sudoku;
+    Sudoku sudokuParallel;
     Sudoku sudokuSequential;
 
-    //  Sequential Sudoku
-    sudoku.readInput(fileName);
+    //  Parallel Sudoku
+    sudokuParallel.readInput(fileName);
 
-    cout << "Current board:\n";
-    sudoku.printBoard(sudoku.currentBoard);
+    cout << "Current board (Parallel):\n";
+    sudokuParallel.printBoard(sudokuParallel.currentBoard);
 
-    cout << "Completed board:\n";
-    sudoku.printBoard(sudoku.completedBoard);
+    cout << "Completed board (Parallel):\n";
+    sudokuParallel.printBoard(sudokuParallel.completedBoard);
 
-    if(sudoku.isCorrect()){
-        cout << "The current board is correct.\n";
+    if(sudokuParallel.isCorrect()){
+        cout << "The current board is correct. (Parallel)\n";
     }
     else{
-        cout << "The current board is not correct.\n";
+        cout << "The current board is not correct. (Parallel)\n";
     }
 
     auto startTimeSudoku = chrono::high_resolution_clock::now();
-    if(sudoku.solve()){
-        cout << "The current board was solved.\n";
-        sudoku.printBoard(sudoku.currentBoard);
+    if(sudokuParallel.solveParallel()){
+        cout << "The current board was solved. (Parallel)\n";
+        sudokuParallel.printBoard(sudokuParallel.currentBoard);
     }else{
-        cout << "The current board was NOT solved.\n";
+        cout << "The current board was NOT solved. (Parallel)\n";
     }
 
     auto durationSudoku = chrono::high_resolution_clock::now() - startTimeSudoku;
-    cout << "Sudoku Sudoku Time = " << chrono::duration_cast<chrono::milliseconds>(durationSudoku).count() << " ms\n" << endl;
+    cout << "Parallel Sudoku Time = " << chrono::duration_cast<chrono::milliseconds>(durationSudoku).count() << " ms\n" << endl;
 
 
     //  Sequential Sudoku
     sudokuSequential.readInput(fileName);
 
-    cout << "Current board:\n";
+    cout << "Current board (Sequential):\n";
     sudokuSequential.printBoard(sudokuSequential.currentBoard);
 
-    cout << "Completed board:\n";
+    cout << "Completed board (Sequential):\n";
     sudokuSequential.printBoard(sudokuSequential.completedBoard);
 
     if(sudokuSequential.isCorrect()){
-        cout << "The current board is correct.\n";
+        cout << "The current board is correct. (Sequential)\n";
     }
     else{
-        cout << "The current board is not correct.\n";
+        cout << "The current board is not correct. (Sequential)\n";
     }
 
-    auto startTimeParSudoku = chrono::high_resolution_clock::now();
-    if(sudokuSequential.solveParallel()){
-        cout << "The current board was solved.\n";
+    auto startTimeSeqSudoku = chrono::high_resolution_clock::now();
+    if(sudokuSequential.solve()){
+        cout << "The current board was solved. (Sequential)\n";
         sudokuSequential.printBoard(sudokuSequential.currentBoard);
     }else{
-        cout << "The current board was NOT solved.\n";
+        cout << "The current board was NOT solved. (Sequential)\n";
     }
 
-    auto parDurationSudoku = chrono::high_resolution_clock::now() - startTimeParSudoku;
-    cout << "Parallel Sudoku Time = " << chrono::duration_cast<chrono::milliseconds>(parDurationSudoku).count() << " ms\n" << endl;
+    auto durationSeqSudoku = chrono::high_resolution_clock::now() - startTimeSeqSudoku;
+    cout << "Sequential Sudoku Time = " << chrono::duration_cast<chrono::milliseconds>(durationSeqSudoku).count() << " ms\n" << endl;
 }
 
-void runNonogram()
+void runNonogramSolver(char* fileName)
 {
     
 }
@@ -335,11 +375,11 @@ int main(int argc, char *argv[])
     {
         if(strcmp(argv[1], "sudoku") == 0)
         {
-            runSudoku(argv[2]);
+            runSudokuSolver(argv[2]);
         }   
         else if(strcmp(argv[1], "nonogram") == 0)
         {
-
+            runNonogramSolver(argv[2]);
         }
         else
         {
