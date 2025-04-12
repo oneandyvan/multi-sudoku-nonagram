@@ -257,17 +257,18 @@ private:
     }
 };
 
+class Nonogram
+{
 
-int main(int argc, char *argv[])
+};
+
+void runSudoku(char* fileName)
 {
     Sudoku sudoku;
     Sudoku sudokuSequential;
 
     //  Sequential Sudoku
-    if (argc > 1)
-    {
-        sudoku.readInput(argv[1]);
-    }
+    sudoku.readInput(fileName);
 
     cout << "Current board:\n";
     sudoku.printBoard(sudoku.currentBoard);
@@ -294,11 +295,8 @@ int main(int argc, char *argv[])
     cout << "Sudoku Sudoku Time = " << chrono::duration_cast<chrono::milliseconds>(durationSudoku).count() << " ms\n" << endl;
 
 
-    //  Parallel Sudoku
-    if (argc > 1)
-    {
-        sudokuSequential.readInput(argv[1]);
-    }
+    //  Sequential Sudoku
+    sudokuSequential.readInput(fileName);
 
     cout << "Current board:\n";
     sudokuSequential.printBoard(sudokuSequential.currentBoard);
@@ -323,6 +321,31 @@ int main(int argc, char *argv[])
 
     auto parDurationSudoku = chrono::high_resolution_clock::now() - startTimeParSudoku;
     cout << "Parallel Sudoku Time = " << chrono::duration_cast<chrono::milliseconds>(parDurationSudoku).count() << " ms\n" << endl;
+}
+
+void runNonogram()
+{
+    
+}
+
+
+int main(int argc, char *argv[])
+{
+    if(argc > 2)
+    {
+        if(strcmp(argv[1], "sudoku") == 0)
+        {
+            runSudoku(argv[2]);
+        }   
+        else if(strcmp(argv[1], "nonogram") == 0)
+        {
+
+        }
+        else
+        {
+            cout << "Invalid puzzle option!";
+        }
+    }
 
     return 0;
 }

@@ -39,17 +39,24 @@ Both **Sudoku** and **Nonograms** are puzzles that can be examined through **com
 
 1. **Compile the Solver**  
    ```bash
-   g++ -std=c++2a -pthread main.cpp -o sudoku
+   g++ -std=c++2a -pthread main.cpp -o solver
    ```
-   This will produce an executable named `sudoku`.
+   This will produce an executable named `solver`.
 
 2. **Run the Solver**  
    ```bash
-   ./sudoku test1.txt
+   ./sudoku puzzletype test1.txt
    ```
-   Replace `test1.txt` with the path to your puzzle file. The file should have:
+   Replace `puzzletype` with the type of puzzle to solve:
+   - **sudoku:** To solve a sudoku puzzle.
+   - **nonogram** To solve a nonogram puzzle.
+
+   Replace `test1.txt` with the path to your puzzle file. 
+   The sudoku puzzle file should have:
    - **First 9 lines:** The current (incomplete) Sudoku board, where underscores (`_`) or other non-digit characters are interpreted as blank spaces (`-1`).
    - **Next 9 lines:** The completed Sudoku board for validation.
+   The nonogram puzzle file should have:
+
 
 3. **Output**  
    - The program prints the current board and the completed board.  
