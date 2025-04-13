@@ -342,6 +342,7 @@ public:
     }
 
 private:
+
     //  For each row line, driver for DFS algorithm
     bool fillRow(int r) {
         //  Base case
@@ -409,45 +410,68 @@ private:
     bool validateColumns(int r) {
         for(int j = 0; j < cols; j++)
         {
-            int count = 0, ptr = 0;
+            int clueIndex = 0;
+            int blockLength = 0;
             bool inBlock = false;
-
-            for(int i = 0; i <= r; i++) 
+    
+            for (int i = 0; i <= r; i++)
             {
-                if(workingBoard[i][j] == 1) 
+                int cell = workingBoard[i][j];
+    
+                if (cell == 1) 
                 {
-                    if(!inBlock) 
+                    //  Either start of block or continue
+                    if (!inBlock) 
                     {
                         inBlock = true;
-                        count++;
-                        if (ptr >= colConstraints[j].size()) 
+                        blockLength = 1;
+    
+                        if (clueIndex >= colConstraints[j].size()) 
                         {
-                            return false;
+                            return false; // too many block sections
                         }
-                        if (count > colConstraints[j][ptr]) 
+                        if (blockLength > colConstraints[j][clueIndex]) 
                         {
-                            return false;
+                            return false; //  block length too long
                         }
                     } 
                     else 
                     {
-                        if (count >= colConstraints[j][ptr]) 
+                        blockLength++;
+    
+                        if (blockLength > colConstraints[j][clueIndex]) 
                         {
-                            return false;
+                            return false; //  block length too long
                         }
                     }
                 } 
                 else 
-                {
-                    if(inBlock) 
+                { 
+                    //  Reset "gap" between clue blockss
+                    if (inBlock) 
                     {
-                        ptr++;
+                        if (blockLength != colConstraints[j][clueIndex]) 
+                        {
+                            return false; // premature or mismatched block end
+                        }
+                        clueIndex++;
                         inBlock = false;
-                        count = 0;
+                        blockLength = 0;
                     }
                 }
             }
+    
+            // For up to row `r`, we check early:
+            // Either unfinished block or finished blocks that don't exceed clue length
+            if (inBlock) 
+            {
+                if (blockLength > colConstraints[j][clueIndex]) 
+                {
+                    return false;
+                }
+            }
         }
+        
         return true;
     }
 
