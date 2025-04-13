@@ -45,29 +45,33 @@ Both **Sudoku** and **Nonograms** are puzzles that can be examined through **com
 
 2. **Run the Solver**  
    ```bash
-   ./sudoku puzzletype test1.txt
+   ./solver puzzletype test1.txt
    ```
    
    Replace `puzzletype` with the type of puzzle to solve:
    - **sudoku** To solve a sudoku puzzle.
    - **nonogram** To solve a nonogram puzzle.
 
-   Replace `test1.txt` with the path to your puzzle file.:
+   Replace `test1.txt` with the path to your puzzle file:
+
+   
    The sudoku puzzle file should have:
    - **First 9 lines:** The current (incomplete) Sudoku board, where underscores (`_`) or other non-digit characters are interpreted as blank spaces (`-1`).
    - **Next 9 lines:** The completed Sudoku board for validation.
+  
+     
    The nonogram puzzle file should have:
    - **First line:** The dimensions of the nongram board as integers in the order of rows *R*, then columns *C*.
    - **Next *R* lines:** List of clue constraints as integers for each row in order from top to bottom (put singular `0` if no clues).
    - **Next *C* lines:** List of clue constraints as integers for each column in order from left to right (put singular `0` if no clues).
    - **Final *R* lines:** List of *C* integers where `0` is empty and `1` is filled for each row from left to right.
 
-3. **Output**  
+4. **Output**  
    - The program prints the current board and the completed board.  
    - It checks if the current board is correct (i.e., no contradictions so far).  
    - If possible, it attempts to solve the Sudoku using a backtracking algorithm and prints the solved board.
 
-4. **Notes**  
+5. **Notes**  
    - Blank spaces are stored as `-1` internally.  
    - Digits are stored at their integer values (`1` through `9`).  
    - The code checks row, column, and 3×3 box constraints before placing any number.  
