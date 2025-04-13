@@ -64,7 +64,7 @@ Both **Sudoku** and **Nonograms** are puzzles that can be examined through **com
    - **First line:** The dimensions of the nongram board as integers in the order of rows *R*, then columns *C*.
    - **Next *R* lines:** List of clue constraints as integers for each row in order from top to bottom (put singular `0` if no clues).
    - **Next *C* lines:** List of clue constraints as integers for each column in order from left to right (put singular `0` if no clues).
-   - **Final *R* lines:** List of *C* integers where `0` is empty and `1` is filled for each row from left to right.
+   - **Final *R* lines:** Solved Nonogram board, where there are *C* integers with `0` represents empty and `1` represents filled for each row from left to right.
 
 4. **Output**  
    - The program prints the current board and the completed board.  
