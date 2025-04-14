@@ -9,11 +9,21 @@
 #include <thread>
 #include <vector>
 #include <chrono>
+#include <future>
+#include <atomic>
+#include <mutex>
 
 using namespace std;
 
+//  Sudoku Constants
 const int WIDTH = 9;
 const int HEIGHT = 9;
+
+//  For Nonogram Parallel Implementation
+atomic<bool> nonogram_solved(false);
+mutex board_mtx;
+const int LOWER_DEPTH = 2;
+const int UPPER_DEPTH = 5;
 
 class Sudoku
 {
@@ -337,7 +347,12 @@ public:
     }
 
     //  DFS initial call on first row
-    bool solve() {
+    bool solve(bool isParallel) {
+        if(isParallel)
+        {
+            nonogram_solved = false;
+            return parallelFillRow(0, workingBoard);
+        }
         return fillRow(0);
     }
 
@@ -348,7 +363,7 @@ private:
         //  Base case
         if(r == rows)
         {
-            return validateAllColumns();
+            return validateAllColumns(workingBoard);
         }
         
         //  Find possibilities for each row line
@@ -358,11 +373,84 @@ private:
 
         for (auto& config : possibilityList) {
             workingBoard[r] = config;
-            if (validateColumns(r) && fillRow(r + 1)) 
+            if (validateColumns(r, workingBoard) && fillRow(r + 1)) 
             {
                 return true;
             }
         }
+        return false;
+    }
+
+    //  Parallel implementation of Nonogram solver
+    bool parallelFillRow(int r, vector<vector<int>> board) 
+    {
+        //  Base case
+        if (r == rows) 
+        {
+            if (validateAllColumns(board)) 
+            {
+                workingBoard = board;
+                return true;
+            }
+            return false;
+
+            return validateAllColumns(board);
+        }
+    
+        vector<vector<int>> possibilityList;
+        vector<int> row(cols, 0);
+        findPossibleRows(0, rowConstraints[r], 0, row, possibilityList);
+    
+        vector<future<bool>> futures;
+
+        // Don't spawn threads if outside optimal depths
+        if (r > LOWER_DEPTH || r < UPPER_DEPTH) {
+            for (auto& config : possibilityList) 
+            {
+                board[r] = config;
+                if (validateColumns(r, board) && parallelFillRow(r + 1, board)) 
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    
+        //  Spawn threads at optimal depths
+        for (auto& config : possibilityList) 
+        {
+            futures.push_back(async(launch::async, [&, config] {
+
+                // Another thread solved it
+                if (nonogram_solved.load(memory_order_relaxed)) 
+                {
+                    return false; 
+                }
+    
+                //  Local copy of board based on differing possibilities
+                vector<vector<int>> localBoard = board;
+                localBoard[r] = config;
+    
+                if (validateColumns(r, localBoard) && parallelFillRow(r + 1, localBoard)) 
+                {
+                    nonogram_solved.exchange(true);
+
+                    return true;
+                }
+    
+                return false;
+            }));
+        }
+    
+        //  See if one future returns true
+        for (auto& f : futures) 
+        {
+            if (f.get()) 
+            {
+                return true;
+            }
+        }
+    
         return false;
     }
 
@@ -407,7 +495,7 @@ private:
     }
 
     // Verifies working board doesn't violate column constraints so far
-    bool validateColumns(int r) {
+    bool validateColumns(int r, const vector<vector<int>>& board) {
         for(int j = 0; j < cols; j++)
         {
             int clueIndex = 0;
@@ -416,7 +504,7 @@ private:
     
             for (int i = 0; i <= r; i++)
             {
-                int cell = workingBoard[i][j];
+                int cell = board[i][j];
     
                 if (cell == 1) 
                 {
@@ -476,7 +564,7 @@ private:
     }
 
     //  Validate column constraints for entire board
-    bool validateAllColumns() {
+    bool validateAllColumns(const vector<vector<int>>& board) {
         for(int j = 0; j < cols; j++) 
         {
             vector<int> blockLengths;
@@ -484,7 +572,7 @@ private:
     
             for(int i = 0; i < rows; i++)
             {
-                if(workingBoard[i][j] == 1) 
+                if(board[i][j] == 1) 
                 {
                     count++;
                 } 
@@ -576,10 +664,27 @@ void runNonogramSolver(char* fileName)
     Nonogram seqNonogram;
     Nonogram parNonogram;
 
-    //  Parallel Sudoku
+    //  Parallel Nonogram
     parNonogram.readInput(fileName);
 
-    //  Sequential Sudoku
+    cout << "Current board:\n";
+    parNonogram.printBoard(parNonogram.workingBoard);
+
+    cout << "Completed board:\n";
+    parNonogram.printBoard(parNonogram.completedBoard);
+
+    auto start_parNonogram = chrono::high_resolution_clock::now();
+    if(parNonogram.solve(true)){
+        cout << "\nThe current board was solved. (Parallel)\n";
+        parNonogram.printBoard(parNonogram.workingBoard);
+    }else{
+        cout << "\nThe current board was NOT solved. (Parallel)\n";
+    }
+
+    auto duration_parNonogram = chrono::high_resolution_clock::now() - start_parNonogram;
+    cout << "Parallel Nonogram Time = " << chrono::duration_cast<chrono::milliseconds>(duration_parNonogram).count() << " ms\n\n" << endl;
+
+    //  Sequential Nonogram
     seqNonogram.readInput(fileName);
 
     cout << "Current board:\n";
@@ -589,7 +694,7 @@ void runNonogramSolver(char* fileName)
     seqNonogram.printBoard(seqNonogram.completedBoard);
 
     auto start_seqNonogram = chrono::high_resolution_clock::now();
-    if(seqNonogram.solve()){
+    if(seqNonogram.solve(false)){
         cout << "\nThe current board was solved. (Sequential)\n";
         seqNonogram.printBoard(seqNonogram.workingBoard);
     }else{
